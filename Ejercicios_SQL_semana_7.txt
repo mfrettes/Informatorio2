@@ -1,0 +1,796 @@
+Ejercicio 1:
+Crear la BD con el siguiente esquema, respetando las claves requeridas:
+EMPLEADO( NOMBRE-EMPLEADO, DIRECCION, CIUDAD)
+TRABAJA (NOMBRE-EMPLEADO, NOMBRE-EMPRESA, SUELDO)
+EMPRESA (NOMBRE-EMPRESA, CIUDAD)
+SUPERVISA (NOMBRE-EMPLEADO, NOMBRE-SUPERVISOR)
+
+Resolución:
+
+Para crear la base de datos `EMPRESAS` con las tablas y claves requeridas se puede utilizar el siguiente código SQL:
+
+```sql
+CREATE TABLE EMPLEADO (
+    NOMBRE_EMPLEADO VARCHAR(50) NOT NULL, 
+    DIRECCION VARCHAR(100), 
+    CIUDAD VARCHAR(50), 
+    PRIMARY KEY (NOMBRE_EMPLEADO)
+);
+
+CREATE TABLE EMPRESA (
+    NOMBRE_EMPRESA VARCHAR(50) NOT NULL, 
+    CIUDAD VARCHAR(50), 
+    PRIMARY KEY (NOMBRE_EMPRESA)
+);
+
+CREATE TABLE TRABAJA (
+    NOMBRE_EMPLEADO VARCHAR(50) NOT NULL, 
+    NOMBRE_EMPRESA VARCHAR(50) NOT NULL, 
+    SUELDO DECIMAL(8,2), 
+    PRIMARY KEY (NOMBRE_EMPLEADO, NOMBRE_EMPRESA), 
+    FOREIGN KEY (NOMBRE_EMPLEADO) REFERENCES EMPLEADO(NOMBRE_EMPLEADO) ON DELETE CASCADE, 
+    FOREIGN KEY (NOMBRE_EMPRESA) REFERENCES EMPRESA(NOMBRE_EMPRESA) ON DELETE CASCADE
+);
+
+CREATE TABLE SUPERVISA (
+    NOMBRE_EMPLEADO VARCHAR(50) NOT NULL, 
+    NOMBRE_SUPERVISOR VARCHAR(50), 
+    PRIMARY KEY (NOMBRE_EMPLEADO), 
+    FOREIGN KEY (NOMBRE_EMPLEADO) REFERENCES EMPLEADO(NOMBRE_EMPLEADO) ON DELETE CASCADE
+);
+```
+
+Este código crea 4 tablas con las claves requeridas.
+
+--------------------------------------------------------------------------------------------------------
+Ejercicio 2:
+Utilizando la siguiente Base de Datos empresas ejecutar sentencias SQL que
+permitan:
+Modificar la base de datos para registrar que `Luis Torres' se mudó a `Málaga'.
+Dar a todos los empleados de la empresa `Oracle' un 10 % de aumento.
+Dar a todos los supervisores de la empresa `Netflix' un 10 % de aumento.
+Dar a todos los supervisores de la empresa `Google' un 10 % de aumento, a
+menos que su salario supere los $1900, en ese caso, dar sólo un 3 % de
+aumento.
+
+Resolución: 
+
+Suponiendo que la base de datos se llama `empresas`, las sentencias SQL para realizar las operaciones son las siguientes:
+
+Modificar la base de datos para registrar que `Luis Torres` se mudó a `Resistencia`.
+
+```sql
+UPDATE EMPLEADO
+SET CIUDAD = 'Resistencia'
+WHERE NOMBRE_EMPLEADO = 'Luis Torres';
+```
+
+Dar a todos los empleados de la empresa `Oracle` un 10% de aumento.
+
+```sql
+UPDATE TRABAJA
+SET SUELDO = SUELDO * 1.1
+WHERE NOMBRE_EMPRESA = 'Oracle';
+```
+
+Dar a todos los supervisores de la empresa `Netflix` un 10% de aumento.
+
+```sql
+UPDATE TRABAJA T
+SET SUELDO = SUELDO * 1.1
+WHERE T.NOMBRE_EMPRESA = 'Netflix'
+AND EXISTS(SELECT 1 FROM SUPERVISA S
+            WHERE T.NOMBRE_EMPLEADO = S.NOMBRE_EMPLEADO);
+```
+
+Dar a todos los supervisores de la empresa `Google` un 10% de aumento, a menos que su salario supere los $1900, en ese caso, dar sólo un 3% de aumento.
+
+```sql
+UPDATE TRABAJA T
+SET SUELDO = CASE 
+                WHEN T.SUELDO <= 1900 THEN T.SUELDO * 1.1
+                ELSE T.SUELDO * 1.03
+            END
+WHERE T.NOMBRE_EMPRESA = 'Google'
+AND EXISTS(SELECT 1 FROM SUPERVISA S
+            WHERE T.NOMBRE_EMPLEADO = S.NOMBRE_EMPLEADO);
+```
+
+Esto dará un aumento del 10% a los supervisores de Google cuyo salario sea menor o igual a $1900, y un aumento del 3% si su salario es mayor a $1900.
+
+-------------------------------------------------------------------------------------------------------
+Ejercicio 3
+"Fabricante"
+PK codigo_fabricante INT(10) NOT NULL
+nombre VARCHAR(100)
+
+"Productos" 
+PK codigo_ṕroducto INT(10) NOT NULL
+FK codigo_fabricante INT(10) NOT NULL
+nombre VARCHAR(100)
+
+Crear la BD con el esquema establecido
+Insertar datos a las tablas utilizando estas sentencias. link
+
+Resolución:
+
+Para crear la base de datos con el esquema establecido y las sentencias necesarias para insertar datos en las tablas se puede utilizar el siguiente código SQL:
+
+```sql
+CREATE TABLE Fabricante (
+    codigo_fabricante INT(10) NOT NULL PRIMARY KEY, 
+    nombre VARCHAR(100)
+);
+
+CREATE TABLE Productos (
+    codigo_producto INT(10) NOT NULL PRIMARY KEY, 
+    codigo_fabricante INT(10) NOT NULL, 
+    nombre VARCHAR(100), 
+    FOREIGN KEY (codigo_fabricante) REFERENCES Fabricante(codigo_fabricante)
+);
+
+INSERT INTO Fabricante (codigo_fabricante, nombre) VALUES 
+(1, 'Apple'),
+(2, 'Samsung'),
+(3, 'Sony');
+
+INSERT INTO Productos (codigo_producto, codigo_fabricante, nombre) VALUES 
+(1001, 1, 'iPhone X'), 
+(1002, 1, 'MacBook Pro'), 
+(2001, 2, 'Galaxy S9'), 
+(2002, 2, 'Galaxy Tab'), 
+(3001, 3, 'Xperia XZ2'), 
+(3002, 3, 'PlayStation 4');
+```
+
+Este código crea las dos tablas `Fabricante` y `Productos` con sus claves primarias y foráneas respectivas, e inserta algunos datos de ejemplo en ambas tablas.
+
+Puedes probar las consultas creadas y la base de datos en este [enlace](https://www.db-fiddle.com/f/5cECysDqt7YGBjicSistKY/0).
+
+Ej de consulta en SQL:
+
+SELECT *
+FROM Fabricante
+JOIN Productos ON Fabricante.codigo_fabricante = Productos.codigo_fabricante
+WHERE Fabricante.nombre = 'Apple';
+
+--------------------------------------------------------------------------------------------------
+Ejercicio 4: Productos
+
+Teniendo en cuenta la BD creada, denominada "Productos", resolver las
+siguientes cuestiones:
+Lista el nombre de todos los productos que hay en la tabla producto.
+Lista todas las columnas de la tabla producto.
+Lista el nombre de los productos y el precio en USD.
+Lista los nombres y los precios de todos los productos de la tabla producto,
+convirtiendo los nombres a mayúscula.
+Lista los nombres y los precios de todos los productos de la tabla producto,
+redondeando el valor del precio.
+Lista el código de los fabricantes que tienen productos en la tabla producto.Lista el código de los fabricantes que tienen productos en la tabla producto,
+eliminando los códigos que aparecen repetidos.
+Lista los nombres de los fabricantes ordenados de forma ascendente.
+Lista los nombres de los productos ordenados en primer lugar por el nombre
+de forma ascendente y en segundo lugar por el precio de forma descendente.
+Devuelve una lista con las 5 primeras filas de la tabla fabricante.
+Lista el nombre de todos los productos del fabricante cuyo código de
+fabricante es igual a 2.
+Lista el nombre de los productos que tienen un precio menor o igual a 120USD
+Devuelve todos los productos del fabricante Lenovo. (Sin utilizar INNER JOIN).
+Devuelve todos los datos de los productos que tienen el mismo precio que el
+producto más caro del fabricante Lenovo. (Sin utilizar INNER JOIN).
+Lista el nombre del producto más caro del fabricante Lenovo.
+Devuelve los nombres de los fabricantes que tienen productos asociados.
+(Utilizando ALL o ANY).
+
+Resolución:
+
+Aquí están las soluciones a cada una de las cuestiones planteadas:
+
+1. Lista el nombre de todos los productos que hay en la tabla producto.
+``` SQL
+SELECT nombre
+FROM producto;
+```
+
+2. Lista todas las columnas de la tabla producto.
+``` SQL
+SELECT *
+FROM producto;
+```
+
+3. Lista el nombre de los productos y el precio en USD.
+``` SQL
+SELECT nombre, precio_usd
+FROM producto;
+```
+
+4. Lista los nombres y los precios de todos los productos de la tabla producto, convirtiendo los nombres a mayúscula.
+``` SQL
+SELECT UPPER(nombre), precio_usd
+FROM producto;
+```
+
+5. Lista los nombres y los precios de todos los productos de la tabla producto, redondeando el valor del precio.
+``` SQL
+SELECT nombre, ROUND(precio_usd)
+FROM producto;
+```
+
+6. Lista el código de los fabricantes que tienen productos en la tabla producto.
+``` SQL
+SELECT DISTINCT codigo_fabricante
+FROM producto;
+```
+
+7. Lista el código de los fabricantes que tienen productos en la tabla producto, eliminando los códigos que aparecen repetidos.
+``` SQL
+SELECT DISTINCT codigo_fabricante
+FROM producto;
+```
+
+8. Lista los nombres de los fabricantes ordenados de forma ascendente.
+``` SQL
+SELECT nombre
+FROM fabricante
+ORDER BY nombre ASC;
+```
+
+9. Lista los nombres de los productos ordenados en primer lugar por el nombre de forma ascendente y en segundo lugar por el precio de forma descendente.
+``` SQL
+SELECT nombre, precio_usd
+FROM producto
+ORDER BY nombre ASC, precio_usd DESC;
+```
+
+10. Devuelve una lista con las 5 primeras filas de la tabla fabricante.
+``` SQL
+SELECT *
+FROM fabricante
+LIMIT 5;
+```
+
+11. Lista el nombre de todos los productos del fabricante cuyo código de fabricante es igual a 2.
+``` SQL
+SELECT nombre
+FROM producto
+WHERE codigo_fabricante = 2;
+```
+
+12. Lista el nombre de los productos que tienen un precio menor o igual a 120USD.
+``` SQL
+SELECT nombre
+FROM producto
+WHERE precio_usd <= 120;
+```
+
+13. Devuelve todos los productos del fabricante Lenovo. (Sin utilizar INNER JOIN).
+``` SQL
+SELECT *
+FROM producto
+WHERE codigo_fabricante = (SELECT codigo_fabricante FROM fabricante WHERE nombre = 'Lenovo');
+```
+
+14. Devuelve todos los datos de los productos que tienen el mismo precio que el producto más caro del fabricante Lenovo. (Sin utilizar INNER JOIN).
+``` SQL
+SELECT *
+FROM producto
+WHERE precio_usd = (SELECT MAX(precio_usd) FROM producto WHERE codigo_fabricante = (SELECT codigo_fabricante FROM fabricante WHERE nombre = 'Lenovo'));
+```
+
+15. Lista el nombre del producto más caro del fabricante Lenovo.
+``` SQL
+SELECT nombre
+FROM producto
+WHERE precio_usd = (SELECT MAX(precio_usd) FROM producto WHERE codigo_fabricante = (SELECT codigo_fabricante FROM fabricante WHERE nombre = 'Lenovo'));
+```
+
+16. Devuelve los nombres de los fabricantes que tienen productos asociados. (Utilizando ALL o ANY).
+``` SQL
+SELECT nombre 
+FROM fabricante 
+WHERE codigo_fabricante = ANY(SELECT codigo_fabricante FROM producto);
+```
+-------------------------------------------------------------------------------------------------------
+Ejercicio 5: Universidad
+Para arrancar descárgate el archivo universidad.sql
+Ejecuta consultas SQL para dar respuesta a los siguientes ítems:
+Lista las asignaturas del tipo "optativa".
+Lista los nombres de Departamento de la Universidad.
+Listar apellidos y nombre de las Personas, convirtiendo ambos elementos a
+mayúsculas
+Listar apellidos y nombres de Profesores mayores a 40 años en la
+Universidad.
+
+Resolución:
+
+Estas son las soluciones a cada uno de los ítems:
+
+1. Lista las asignaturas del tipo "optativa".
+``` SQL
+SELECT *
+FROM asignatura
+WHERE tipo = 'optativa';
+```
+
+2. Lista los nombres de Departamento de la Universidad.
+``` SQL
+SELECT nombre 
+FROM departamento;
+```
+
+3. Listar apellidos y nombre de las Personas, convirtiendo ambos elementos a mayúsculas.
+``` SQL
+SELECT UPPER(apellido) AS Apellido, UPPER(nombre) AS Nombre
+FROM persona;
+```
+
+4. Listar apellidos y nombres de Profesores mayores a 40 años en la Universidad.
+``` SQL
+SELECT UPPER(apellido) AS Apellido, UPPER(nombre) AS Nombre
+FROM persona
+WHERE edad > 40 AND id_persona IN (SELECT id_profesor FROM curso);
+```
+-------------------------------------------------------------------------------------------------------
+Ejercicio 7: Northwind
+Descarga el archivo llamado northwind.sql y ejecutar el script.
+Tras haberlo ejecutado se creará una base de datos de nombre Northwind y se
+rellenará con los datos de ejemplo.
+Ejecuta consultas SQL que permita dar respuestas a:
+Una lista de los nombres y apellidos de la tabla de EMPLOYEES.
+Una lista de todos los nombres de las ciudades que aparecen en la tabla de
+EMPLOYEES. No mostrar 2 veces un mismo nombre de ciudad.
+Una lista de los nombres de productos y precios unitarios de la tabla
+PRODUCTS.
+En la tabla EMPLOYEES: una lista de los detalles completos de quienes viven
+en EE.UU.
+A partir de la tabla ORDERS, listar todos los pedidos que tienen un gasto de
+envío > 50.
+De la tabla de CUSTOMERS: listar nombre de la empresa de clientes donde el
+cargo es igual a Owner.A partir de la tabla CUSTOMERS una lista de clientes cuyo nombre comienza
+con la letra "A”.
+Una lista de los nombres de clientes donde la región no está en blanco.
+Una lista de todos los productos, ordenado por precio unitario (el más barato
+primero).
+Una lista de todos los productos, ordenado por precio unitario (el más caro
+primero).
+El número total de registros de la tabla EMPLOYEES. Nombre de la columna de
+salida "TotalEmpleados".
+De la tabla de pedidos, el gasto de envío promedio y el máximo gasto de
+envío.
+
+Resolución:
+
+Estas son las soluciones a cada uno de los ítems:
+
+1. Una lista de los nombres y apellidos de la tabla de EMPLOYEES.
+``` SQL
+SELECT FirstName, LastName
+FROM Employees;
+```
+
+2. Una lista de todos los nombres de las ciudades que aparecen en la tabla de EMPLOYEES. No mostrar 2 veces un mismo nombre de ciudad.
+``` SQL
+SELECT DISTINCT City 
+FROM Employees;
+```
+
+3. Una lista de los nombres de productos y precios unitarios de la tabla PRODUCTS.
+``` SQL
+SELECT ProductName, UnitPrice
+FROM Products;
+```
+
+4. En la tabla EMPLOYEES: una lista de los detalles completos de quienes viven en EE.UU.
+``` SQL
+SELECT *
+FROM Employees
+WHERE Country = 'USA';
+```
+
+5. A partir de la tabla ORDERS, listar todos los pedidos que tienen un gasto de envío > 50.
+``` SQL
+SELECT *
+FROM Orders
+WHERE Freight > 50;
+```
+
+6. De la tabla CUSTOMERS: listar nombre de la empresa de clientes donde el cargo es igual a Owner.
+``` SQL
+SELECT CompanyName
+FROM Customers
+WHERE ContactTitle = 'Owner';
+```
+
+7. A partir de la tabla CUSTOMERS una lista de clientes cuyo nombre comienza con la letra "A”.
+``` SQL
+SELECT *
+FROM Customers
+WHERE CustomerName LIKE 'A%';
+```
+
+8. Una lista de los nombres de clientes donde la región no está en blanco.
+``` SQL
+SELECT CustomerName
+FROM Customers
+WHERE Region IS NOT NULL;
+```
+
+9. Una lista de todos los productos, ordenado por precio unitario (el más barato primero).
+``` SQL
+SELECT ProductName, UnitPrice
+FROM Products
+ORDER BY UnitPrice ASC;
+```
+
+10. Una lista de todos los productos, ordenado por precio unitario (el más caro primero).
+``` SQL
+SELECT ProductName, UnitPrice
+FROM Products
+ORDER BY UnitPrice DESC;
+```
+
+11. El número total de registros de la tabla EMPLOYEES. Nombre de la columna de salida "TotalEmpleados".
+``` SQL
+SELECT COUNT(*) AS TotalEmpleados
+FROM Employees;
+```
+
+12. De la tabla de pedidos, el gasto de envío promedio y el máximo gasto de envío.
+``` SQL
+SELECT AVG(Freight) AS GastoPromedio, MAX(Freight) AS MaximoGasto
+FROM Orders;
+```
+----------------------------------------------------------------------------------------------------
+Ejercicio 8: RRHH
+Descarga el archivo llamado RRHH.sql y ejecutar el script.
+Ejecuta consultas SQL que permita dar respuestas a:
+En base a la tabla EMPLOYEES, listar datos de quienes tengan un sueldo mayor
+a 10000.
+En base a la tabla EMPLOYEES, contar cuántas personas, al aplicar un
+aumento de 5%, su sueldo supere los 15000.
+Listar los nombres de todos los departamentos.
+Listar la cantidad de personas de la tabla EMPLOYEES, que tengan el cargo de
+Programador. Y cuantas de estas personas superen el sueldo mínimo en esa
+categoría.
+
+Resolución:
+
+Estas son las soluciones a cada uno de los ítems:
+
+1. En base a la tabla EMPLOYEES, listar datos de quienes tengan un sueldo mayor a 10000.
+``` SQL
+SELECT *
+FROM Employees
+WHERE Salary > 10000;
+```
+
+2. En base a la tabla EMPLOYEES, contar cuántas personas, al aplicar un aumento de 5%, su sueldo supere los 15000.
+``` SQL
+SELECT COUNT(*)
+FROM Employees
+WHERE (Salary * 1.05) > 15000;
+```
+
+3. Listar los nombres de todos los departamentos.
+``` SQL
+SELECT DepartmentName
+FROM Departments;
+```
+
+4. Listar la cantidad de personas de la tabla EMPLOYEES, que tengan el cargo de Programador. Y cuantas de estas personas superen el sueldo mínimo en esa categoría.
+``` SQL
+SELECT COUNT(*) AS TotalProgramadores, 
+       SUM(CASE WHEN Salary > 30000 THEN 1 ELSE 0 END) AS ProgramadoresSueldoSuperior
+FROM Employees
+WHERE JobTitle = 'Programador';
+```
+En este caso, se asume que el sueldo mínimo para la categoría de Programador es de 30000. La consulta utiliza un caso condicional para contar la cantidad de Programadores con sueldo superior a ese valor.
+
+-----------------------------------------------------------------------------------------------------
+Ejercicio 9: Verdulería
+Para trabajar con este caso debes descargar los scripts de SQL para crear la BD
+Verduleria.sql.
+Te proponemos resolver las siguientes consultas SQL:
+Obtener la lista de las ventas, pero con el nombre de la persona que lo vende
+en lugar de su identificador.
+Obtener la lista de las ventas pero con el nombre del producto en lugar del
+código.
+Obtener la lista de las ventas pero con el nombre del producto y quién lo
+vendió.
+Obtener el nombre de quien más kilos vendió.
+Cuántos Kilos de Tomates se han vendido.
+Obtener todos los datos de cada venta, que haya superado el promedio de
+kilos vendidos en total.
+Obtener cuál fue el producto más vendido del grupo de "Hortalizas"Obtener los datos de la persona que menos kilos vendió, e informar el
+nombre del producto y del grupo al que corresponde esa venta.
+Obtener los totales de ventas por producto.
+Idear una consulta que te parece interesante para informar a quien
+administra la Verdulería online.
+
+Resolución: 
+
+1. Obtener la lista de las ventas, pero con el nombre de la persona que lo vende en lugar de su identificador.
+``` SQL
+SELECT Venta.*, Persona.Nombre
+FROM Venta
+JOIN Persona ON Venta.PersonaID = Persona.ID;
+```
+
+2. Obtener la lista de las ventas pero con el nombre del producto en lugar del código.
+``` SQL
+SELECT Venta.*, Producto.Nombre
+FROM Venta
+JOIN Producto ON Venta.ProductoID = Producto.ID;
+```
+
+3. Obtener la lista de las ventas pero con el nombre del producto y quién lo vendió.
+``` SQL
+SELECT Venta.*, Producto.Nombre, Persona.Nombre
+FROM Venta
+JOIN Producto ON Venta.ProductoID = Producto.ID
+JOIN Persona ON Venta.PersonaID = Persona.ID;
+```
+
+4. Obtener el nombre de quien más kilos vendió.
+``` SQL
+SELECT Persona.Nombre, SUM(Venta.Kilos) AS TotalKilos
+FROM Venta
+JOIN Persona ON Venta.PersonaID = Persona.ID
+GROUP BY Persona.ID
+ORDER BY TotalKilos DESC
+LIMIT 1;
+```
+
+5. Cuántos Kilos de Tomates se han vendido.
+``` SQL
+SELECT SUM(Kilos) AS TotalKilos
+FROM Venta
+JOIN Producto ON Venta.ProductoID = Producto.ID
+WHERE Producto.Nombre = 'Tomate';
+```
+
+6. Obtener todos los datos de cada venta, que haya superado el promedio de kilos vendidos en total.
+``` SQL
+SELECT Venta.*
+FROM Venta
+JOIN (SELECT AVG(Kilos) AS PromedioKilos FROM Venta) AS Promedio
+WHERE Venta.Kilos > Promedio.PromedioKilos;
+```
+
+7. Obtener cuál fue el producto más vendido del grupo de "Hortalizas".
+``` SQL
+SELECT Producto.Nombre, SUM(Venta.Kilos) AS TotalKilos
+FROM Venta
+JOIN Producto ON Venta.ProductoID = Producto.ID
+JOIN GrupoProducto ON Producto.GrupoID = GrupoProducto.ID
+WHERE GrupoProducto.Nombre = 'Hortalizas'
+GROUP BY Producto.ID
+ORDER BY TotalKilos DESC
+LIMIT 1;
+```
+
+8. Obtener los datos de la persona que menos kilos vendió, e informar el nombre del producto y del grupo al que corresponde esa venta.
+``` SQL
+SELECT Persona.*, Producto.Nombre, GrupoProducto.Nombre
+FROM Venta
+JOIN Persona ON Venta.PersonaID = Persona.ID
+JOIN Producto ON Venta.ProductoID = Producto.ID
+JOIN GrupoProducto ON Producto.GrupoID = GrupoProducto.ID
+WHERE Venta.Kilos = (SELECT MIN(Kilos) FROM Venta)
+ORDER BY Persona.ID
+LIMIT 1;
+```
+
+9. Obtener los totales de ventas por producto.
+``` SQL
+SELECT Producto.Nombre, SUM(Venta.Kilos) AS TotalKilos, SUM(Venta.Monto) AS TotalMonto
+FROM Venta
+JOIN Producto ON Venta.ProductoID = Producto.ID
+GROUP BY Producto.ID;
+```
+
+10. Idear una consulta que te parece interesante para informar a quien administra la Verdulería online.
+``` SQL
+SELECT Persona.Nombre, SUM(Venta.Monto) AS TotalMonto
+FROM Venta
+JOIN Persona ON Venta.PersonaID = Persona.ID
+JOIN TipoVenta ON Venta.TipoVentaID = TipoVenta.ID
+WHERE TipoVenta.Nombre = 'Online'
+GROUP BY Persona.ID
+ORDER BY TotalMonto DESC;
+```
+Esta consulta muestra el monto total de ventas online por persona, mostrando las personas que más vendieron en orden descendente. Esto puede ser útil para determinar cuáles son los vendedores más efectivos en línea y ajustar la estrategia de ventas en consecuencia.
+
+-----------------------------------------------------------------------------------------------------------
+Ejercicio 10: Seguimiento de Personal
+Para trabajar con este caso debes descargar los scripts de SQL para:
+Crear tablas en la base de datos Personal: DDL.
+Insertar datos en las tablas: DML
+Resolver las siguientes consultas SQL:
+Obtener los datos completos del Personal.
+Obtener los datos completos de los departamentos
+Obtener los datos de personal con cargo 'Secretaria'.
+Obtener el nombre y salario de los/las empleados/as.
+Obtener los datos de vendedores, ordenado por nombre.
+Listar el nombre de los departamentos
+Listar el nombre de los departamentos, ordenado por nombre
+Listar el nombre de los departamentos, ordenado por ciudad
+Listar el nombre de los departamentos, ordenado por ciudad, en orden
+inverso
+Obtener el nombre y cargo del personal, ordenado por salario
+Listar los salarios y comisiones del personal del departamento 2000
+Listar los salarios y comisiones del personal del departamento 2000,
+ordenado por comisión
+Listar todas las comisiones
+Obtener el valor total a pagar que resulta de sumar al personal del
+departamento 3000 una bonificación de $500.000, en orden alfabético por
+nombre.
+Listar los empleados cuya comisión es menor o igual que el 30% de su sueldo.
+Elabore un listado donde para cada fila, figure ‘Nombre’ y ‘Cargo’ antes del
+valor respectivo para cada persona
+Hallar el salario y la comisión de aquellas personas cuyo número de
+documento de identidad es superior al '19.709.802'
+Genere un grupo de personas, incluyendo aquéllas cuyo nombre inicie por la
+letra J. Emita un listado con nombre y su cargo por orden alfabético.
+Listar el salario, la comisión, el salario total (salario + comisión), documento
+de identidad de la persona y nombre, de quienes tienen comisión superior a
+$1.000.000, ordenar el informe por el número del documento de identidad
+Hallar el nombre de empleados/as que tienen un salario superior a $1.000.000,
+y tienen como jefe/a a alguien con documento de identidad '31.840.269'
+Obtener los nombres de los departamentos que no sean “Ventas” ni
+“Investigación” ni ‘MANTENIMIENTO’, ordenados por ciudad.
+
+Resolución:
+
+Estas son las soluciones a cada una de las consultas planteadas:
+
+1. Obtener los datos completos del Personal.
+``` SQL
+SELECT *
+FROM Personal;
+```
+
+2. Obtener los datos completos de los departamentos.
+``` SQL
+SELECT *
+FROM Departamentos;
+```
+
+3. Obtener los datos de personal con cargo 'Secretaria'.
+``` SQL
+SELECT *
+FROM Personal
+WHERE Cargo = 'Secretaria';
+```
+
+4. Obtener el nombre y salario de los/las empleados/as.
+``` SQL
+SELECT Nombre, Salario
+FROM Personal;
+```
+
+5. Obtener los datos de vendedores, ordenado por nombre.
+``` SQL
+SELECT *
+FROM Personal
+WHERE Cargo = 'Vendedor'
+ORDER BY Nombre;
+```
+
+6. Listar el nombre de los departamentos.
+``` SQL
+SELECT Nombre
+FROM Departamentos;
+```
+
+7. Listar el nombre de los departamentos, ordenado por nombre.
+``` SQL
+SELECT Nombre
+FROM Departamentos
+ORDER BY Nombre;
+```
+
+8. Listar el nombre de los departamentos, ordenado por ciudad.
+``` SQL
+SELECT Nombre
+FROM Departamentos
+ORDER BY Ciudad;
+```
+
+9. Listar el nombre de los departamentos, ordenado por ciudad, en orden inverso.
+``` SQL
+SELECT Nombre
+FROM Departamentos
+ORDER BY Ciudad DESC;
+```
+
+10. Obtener el nombre y cargo del personal, ordenado por salario.
+``` SQL
+SELECT Nombre, Cargo
+FROM Personal
+ORDER BY Salario;
+```
+
+11. Listar los salarios y comisiones del personal del departamento 2000.
+``` SQL
+SELECT Salario, Comision
+FROM Personal
+WHERE DepartamentoID = 2000;
+```
+
+12. Listar los salarios y comisiones del personal del departamento 2000, ordenado por comisión.
+``` SQL
+SELECT Salario, Comision
+FROM Personal
+WHERE DepartamentoID = 2000
+ORDER BY Comision;
+```
+
+13. Listar todas las comisiones.
+``` SQL
+SELECT Comision
+FROM Personal;
+```
+
+14. Obtener el valor total a pagar que resulta de sumar al personal del departamento 3000 una bonificación de $500.000, ordenado alfabéticamente por nombre.
+``` SQL
+SELECT Nombre, Salario + Comision + 500000 AS TotalPagar
+FROM Personal
+WHERE DepartamentoID = 3000
+ORDER BY Nombre;
+```
+
+15. Listar los empleados cuya comisión es menor o igual que el 30% de su sueldo.
+``` SQL
+SELECT *
+FROM Personal
+WHERE Comision <= (0.3 * Salario);
+```
+
+16. Elabore un listado donde para cada fila, figure ‘Nombre’ y ‘Cargo’ antes del valor respectivo para cada persona.
+``` SQL
+SELECT Concat('Nombre: ', Nombre, ', Cargo: ', Cargo, ', Salario: ', Salario, ', Comision: ', Comision) AS DatosCompletos
+FROM Personal;
+```
+
+17. Hallar el salario y la comisión de aquellas personas cuyo número de documento de identidad es superior al '19.709.802'.
+``` SQL
+SELECT Salario, Comision
+FROM Personal
+WHERE Documento > '19.709.802';
+```
+
+18. Genere un grupo de personas, incluyendo aquéllas cuyo nombre inicie por la letra J. Emita un listado con nombre y su cargo por orden alfabético.
+``` SQL
+SELECT Nombre, Cargo
+FROM Personal
+WHERE Nombre LIKE 'J%'
+ORDER BY Nombre;
+```
+
+19. Listar el salario, la comisión, el salario total (salario + comisión), documento de identidad de la persona y nombre, de quienes tienen comisión superior a $1.000.000, ordenar el informe por el número del documento de identidad.
+``` SQL
+SELECT Documento, Nombre, Salario, Comision, Salario + Comision AS SalarioTotal
+FROM Personal
+WHERE Comision > 1000000
+ORDER BY Documento;
+```
+
+20. Hallar el nombre de empleados/as que tienen un salario superior a $1.000.000 y tienen como jefe/a a alguien con documento de identidad '31.840.269'.
+``` SQL
+SELECT p1.Nombre
+FROM Personal p1
+JOIN Personal p2 ON p1.JefeID = p2.ID
+WHERE p1.Salario > 1000000 AND p2.Documento = '31.840.269';
+```
+
+21. Obtener los nombres de los departamentos que no sean “Ventas” ni “Investigación” ni “MANTENIMIENTO”, ordenados por ciudad.
+``` SQL
+SELECT Nombre
+FROM Departamentos
+WHERE Nombre NOT IN ('Ventas', 'Investigación', 'MANTENIMIENTO')
+ORDER BY Ciudad;
+```
+
+
+
