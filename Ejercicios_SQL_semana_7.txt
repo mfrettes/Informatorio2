@@ -52,7 +52,7 @@ Este código crea 4 tablas con las claves requeridas.
 Ejercicio 2:
 Utilizando la siguiente Base de Datos empresas ejecutar sentencias SQL que
 permitan:
-Modificar la base de datos para registrar que `Luis Torres' se mudó a `Málaga'.
+Modificar la base de datos para registrar que `Luis Torres' se mudó a `Resistencia'.
 Dar a todos los empleados de la empresa `Oracle' un 10 % de aumento.
 Dar a todos los supervisores de la empresa `Netflix' un 10 % de aumento.
 Dar a todos los supervisores de la empresa `Google' un 10 % de aumento, a
