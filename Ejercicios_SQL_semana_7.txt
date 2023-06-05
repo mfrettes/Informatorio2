@@ -10,6 +10,12 @@ Resolución:
 Para crear la base de datos `EMPRESAS` con las tablas y claves requeridas se puede utilizar el siguiente código SQL:
 
 ```sql
+-- Creamos la base de datos "Empresas"
+CREATE DATABASE Empresas;
+
+-- Seleccionamos la base de datos "Empresas" para poder crear las tablas
+USE Empresas;
+
 CREATE TABLE EMPLEADO (
     NOMBRE_EMPLEADO VARCHAR(50) NOT NULL, 
     DIRECCION VARCHAR(100), 
