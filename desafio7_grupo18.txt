@@ -1,0 +1,133 @@
+-- Creamos la base de datos "blog_ong"
+DROP DATABASE IF EXISTS blog_ong;
+CREATE DATABASE blog_ong;
+
+-- Seleccionamos la base de datos "blog_ong" para poder crear las tablas
+USE blog_ong;
+
+-- Creamos la tabla "Usuario"
+CREATE TABLE Usuario (
+  id_usuario INT NOT NULL AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL,
+  apellido VARCHAR(50) NOT NULL,
+  telefono VARCHAR(20),
+  username VARCHAR(50),
+  email VARCHAR(50),
+  contrasena VARCHAR(100),
+  estado VARCHAR(20) DEFAULT 'Activo',
+  fecha_creacion DATE,
+  avatar VARCHAR(100),
+  es_publico BOOLEAN,
+  es_colaborador BOOLEAN,
+  es_admin BOOLEAN,
+  PRIMARY KEY (id_usuario)
+);
+
+-- Creamos la tabla "Artículo" con las claves foráneas a la tabla "Usuario"
+CREATE TABLE Articulo (
+  id_articulo INT NOT NULL AUTO_INCREMENT,
+  id_usuario INT NOT NULL,
+  titulo VARCHAR(100) NOT NULL,
+  resumen TEXT(1000),
+  contenido TEXT,
+  fecha_publicacion DATE,
+  estado VARCHAR(20) DEFAULT 'Publicado',
+  imagen VARCHAR(100),
+  PRIMARY KEY (id_articulo),
+  FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
+
+-- Creamos la tabla "Comentario" con las claves foráneas a las tablas "Artículo" y "Usuario"
+CREATE TABLE Comentario (
+  id_comentario INT NOT NULL AUTO_INCREMENT,
+  id_articulo INT NOT NULL,
+  id_usuario INT NOT NULL,
+  contenido TEXT,
+  fecha_hora DATETIME,
+  estado VARCHAR(20) DEFAULT 'Publicado',
+  PRIMARY KEY (id_comentario),
+  FOREIGN KEY (id_articulo) REFERENCES Articulo(id_articulo),
+  FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
+);
+
+-- Creamos la tabla "Categoria_Articulo" con las claves foráneas a las tablas "Artículo" y "Categoria"
+CREATE TABLE Categoria_Articulo (
+  id_articulo INT NOT NULL,
+  id_categoria INT NOT NULL,
+  PRIMARY KEY (id_articulo, id_categoria),
+  FOREIGN KEY (id_articulo) REFERENCES Articulo(id_articulo),
+  FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria)
+);
+
+-- Creamos la tabla "Categoria"
+CREATE TABLE Categoria (
+  id_categoria INT NOT NULL AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL,
+  descripcion VARCHAR(100),
+  imagen VARCHAR(100),
+  estado VARCHAR(20) DEFAULT 'Activo',
+  PRIMARY KEY (id_categoria)
+);
+
+/* Para agregar los usuarios con los roles especificados,
+ podemos ejecutar el siguiente comando SQL: */
+
+INSERT INTO Usuario (nombre, apellido, telefono, username, email, contrasena, fecha_creacion, es_publico, es_colaborador, es_admin) 
+VALUES 
+  ('Admin', 'Admin', '123456789', 'admin', 'admin@ejemplo.com', 'admin123', CURDATE(), false, false, true),
+  ('Colaborador 1', 'Apellido 1', '123456789', 'colaborador1', 'colaborador1@ejemplo.com', 'colaborador1123', CURDATE(), false, true, false),
+  ('Colaborador 2', 'Apellido 2', '123456789', 'colaborador2', 'colaborador2@ejemplo.com', 'colaborador2123', CURDATE(), false, true, false),
+  ('Colaborador 3', 'Apellido 3', '123456789', 'colaborador3', 'colaborador3@ejemplo.com', 'colaborador3123', CURDATE(), false, true, false),
+  ('Colaborador 4', 'Apellido 4', '123456789', 'colaborador4', 'colaborador4@ejemplo.com', 'colaborador4123', CURDATE(), false, true, false),
+  ('Publico 1', 'Apellido 5', '123456789', 'publico1', 'publico1@ejemplo.com', 'publico1123', CURDATE(), true, false, false),
+  ('Publico 2', 'Apellido 6', '123456789', 'publico2', 'publico2@ejemplo.com', 'publico2123', CURDATE(), true, false, false),
+  ('Publico 3', 'Apellido 7', '123456789', 'publico3', 'publico3@ejemplo.com', 'publico3123', CURDATE(), true, false, false),
+  ('Publico 4', 'Apellido 8', '123456789', 'publico4', 'publico4@ejemplo.com', 'publico4123', CURDATE(), true, false, false),
+  ('Publico 5', 'Apellido 9', '123456789', 'publico5', 'publico5@ejemplo.com', 'publico5123', CURDATE(), true, false, false);
+ 
+ /* Para actualizar uno de los usuarios con rol de colaborador a admin, 
+ podemos ejecutar el siguiente comando SQL:*/
+ UPDATE Usuario SET es_admin = true WHERE id_usuario = [ID_DEL_USUARIO];
+  -- Donde [ID_DEL_USUARIO] es el id_usuario del usuario que deseamos actualizar.
+
+-- Para introducir los artículos con los estados especificados, podemos ejecutar
+-- el siguiente comando SQL:
+  INSERT INTO Articulo (id_usuario, titulo, resumen, contenido, fecha_publicacion, estado) 
+VALUES 
+  ([ID_USUARIO], 'Artículo 1', 'Resumen del artículo 1', 'Contenido del artículo 1', CURDATE(), true),
+  ([ID_USUARIO], 'Artículo 2', 'Resumen del artículo 2', 'Contenido del artículo 2', CURDATE(), true),
+  ([ID_USUARIO], 'Artículo 3', 'Resumen del artículo 3', 'Contenido del artículo 3', CURDATE(), true),
+  ([ID_USUARIO], 'Artículo 4', 'Resumen del artículo 4', 'Contenido del artículo 4', CURDATE(), false);
+  -- Donde [ID_USUARIO] es el id_usuario del autor de los artículos.
+
+-- Para eliminar el artículo que tenga estado FALSE, podemos ejecutar el 
+-- siguiente comando SQL:
+  DELETE FROM Articulo WHERE estado = false;
+  
+  -- Para introducir los comentarios a los artículos especificados, 
+  -- podemos ejecutar el siguiente comando SQL:
+  INSERT INTO Comentario (id_articulo, id_usuario, contenido, fecha_hora) 
+VALUES 
+  ([ID_ARTICULO_1], [ID_USUARIO_1], 'Comentario 1 del artículo 1', NOW()),
+  ([ID_ARTICULO_1], [ID_USUARIO_2], 'Comentario 2 del artículo 1', NOW()),
+  ([ID_ARTICULO_1], [ID_USUARIO_3], 'Comentario 3 del artículo 1', NOW()),
+  ([ID_ARTICULO_2], [ID_USUARIO_1], 'Comentario 1 del artículo 2', NOW()),
+  ([ID_ARTICULO_2], [ID_USUARIO_2], 'Comentario 2 del artículo 2', NOW());
+  /*Donde [ID_ARTICULO_1] e [ID_ARTICULO_2] son los id_articulo de los artículos 
+  a los que queremos agregar comentarios, y [ID_USUARIO_1], [ID_USUARIO_2] y
+  [ID_USUARIO_3] son los id_usuario de los usuarios que realizan los comentarios. */
+  
+  /*Para listar todos los artículos que tengan comentarios, mostrando el 
+  título del artículo, la fecha_publicacion del artículo, el nombre del usuario
+  que realizo el comentario y la fecha_hora que realizó dicho comentario,
+  agrupados por artículos, podemos ejecutar el siguiente comando SQL: */
+    SELECT a.titulo AS 'Titulo del Articulo', a.fecha_publicacion AS 'Fecha del Articulo', u.nombre AS 'Nombre del Usuario', c.fecha_hora AS 'Fecha del Comentario'
+FROM Articulo a
+INNER JOIN Comentario c ON a.id_articulo = c.id_articulo
+INNER JOIN Usuario u ON u.id_usuario = c.id_usuario
+GROUP BY a.id_articulo;
+/* Este comando realizará una unión de las tablas Articulo, Comentario y Usuario
+ y seleccionará los campos especificados. Luego, se agruparán los resultados 
+ por el id del artículo, lo que nos permitirá obtener toda la información 
+ agrupada por artículo.*/
+
