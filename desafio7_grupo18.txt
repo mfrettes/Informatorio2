@@ -87,11 +87,13 @@ VALUES
  
  /* Para actualizar uno de los usuarios con rol de colaborador a admin, 
  podemos ejecutar el siguiente comando SQL:*/
- UPDATE Usuario SET es_admin = true WHERE id_usuario = [ID_DEL_USUARIO];
+ 
+ UPDATE Usuario SET es_admin = true WHERE id_usuario = [ID_DEL_USUARIO]; 
   -- Donde [ID_DEL_USUARIO] es el id_usuario del usuario que deseamos actualizar.
 
 -- Para introducir los artículos con los estados especificados, podemos ejecutar
 -- el siguiente comando SQL:
+
   INSERT INTO Articulo (id_usuario, titulo, resumen, contenido, fecha_publicacion, estado) 
 VALUES 
   ([ID_USUARIO], 'Artículo 1', 'Resumen del artículo 1', 'Contenido del artículo 1', CURDATE(), true),
@@ -102,10 +104,12 @@ VALUES
 
 -- Para eliminar el artículo que tenga estado FALSE, podemos ejecutar el 
 -- siguiente comando SQL:
+
   DELETE FROM Articulo WHERE estado = false;
   
   -- Para introducir los comentarios a los artículos especificados, 
   -- podemos ejecutar el siguiente comando SQL:
+  
   INSERT INTO Comentario (id_articulo, id_usuario, contenido, fecha_hora) 
 VALUES 
   ([ID_ARTICULO_1], [ID_USUARIO_1], 'Comentario 1 del artículo 1', NOW()),
@@ -121,11 +125,13 @@ VALUES
   título del artículo, la fecha_publicacion del artículo, el nombre del usuario
   que realizo el comentario y la fecha_hora que realizó dicho comentario,
   agrupados por artículos, podemos ejecutar el siguiente comando SQL: */
+  
     SELECT a.titulo AS 'Titulo del Articulo', a.fecha_publicacion AS 'Fecha del Articulo', u.nombre AS 'Nombre del Usuario', c.fecha_hora AS 'Fecha del Comentario'
 FROM Articulo a
 INNER JOIN Comentario c ON a.id_articulo = c.id_articulo
 INNER JOIN Usuario u ON u.id_usuario = c.id_usuario
 GROUP BY a.id_articulo;
+
 /* Este comando realizará una unión de las tablas Articulo, Comentario y Usuario
  y seleccionará los campos especificados. Luego, se agruparán los resultados 
  por el id del artículo, lo que nos permitirá obtener toda la información 
