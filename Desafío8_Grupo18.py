@@ -1,6 +1,6 @@
 '''
 Desafío 8: Principios de programación orientada a objetos
------------------------------------------------------------
+----------------------------------------------------------
 Requisitos técnicos:
 - Herencia
 - Encapsulamiento
